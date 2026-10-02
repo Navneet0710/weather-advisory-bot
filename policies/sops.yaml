@@ -1,0 +1,172 @@
+sops:
+  - id: CYC-01
+    name: Strong wind and cycling
+    category: cycling
+    activities: [cycling]
+    scope: activity
+    severity: high
+    priority: 100
+    lead: false
+    conditions:
+      all:
+        - {field: wind_gusts_10m, source: hourly, aggregate: max, op: ">=", value: 45}
+    guidance: Strong wind conditions meet the cycling SOP for elevated risk; consider postponing the ride or choosing an indoor alternative.
+    rationale: Protects cyclists when forecast gusts reach the configured high-risk threshold.
+  - id: CYC-02
+    name: Rain and cycling
+    category: cycling
+    activities: [cycling]
+    scope: activity
+    severity: caution
+    priority: 70
+    lead: false
+    conditions:
+      any:
+        - {field: precipitation_probability, source: hourly, aggregate: max, op: ">=", value: 50}
+        - {field: precipitation, source: hourly, aggregate: sum, op: ">=", value: 1}
+    guidance: The cycling rain SOP applies; consider postponing or changing the trip if rain is expected during the selected window.
+    rationale: Covers meaningful rain probability or precipitation during cycling.
+  - id: EX-01
+    name: High heat and outdoor exercise
+    category: outdoor_exercise
+    activities: [running, exercise, walking, workout]
+    scope: activity
+    severity: high
+    priority: 90
+    lead: false
+    conditions:
+      all:
+        - {field: temperature_2m, source: hourly, aggregate: max, op: ">=", value: 36}
+    guidance: The heat SOP applies to outdoor exercise; consider moving the activity to a cooler time or indoors.
+    rationale: Provides a clear heat trigger for outdoor exercise.
+  - id: EX-02
+    name: High UV and outdoor exercise
+    category: outdoor_exercise
+    activities: [running, exercise, walking, workout]
+    scope: activity
+    severity: caution
+    priority: 65
+    lead: false
+    conditions:
+      all:
+        - {field: uv_index, source: hourly, aggregate: max, op: ">=", value: 8}
+    guidance: The high-UV SOP applies; consider an earlier or later activity window and use the protective measures required by your local policy.
+    rationale: Adds a separate UV-specific rule so multiple genuine risks can surface.
+  - id: KID-01
+    name: Heat and children outdoors
+    category: children
+    activities: [park, playground, children]
+    scope: activity
+    severity: caution
+    priority: 80
+    lead: false
+    conditions:
+      any:
+        - {field: temperature_2m, source: hourly, aggregate: max, op: ">=", value: 33}
+        - {field: uv_index, source: hourly, aggregate: max, op: ">=", value: 6}
+    guidance: The children-outdoors SOP applies; consider a cooler or lower-exposure time for the activity.
+    rationale: Covers heat or UV conditions for the configured child-focused activities.
+  - id: ELD-01
+    name: Heat and elderly outdoors
+    category: elderly
+    activities: [elderly, senior]
+    scope: activity
+    severity: high
+    priority: 85
+    lead: false
+    conditions:
+      all:
+        - {field: temperature_2m, source: hourly, aggregate: max, op: ">=", value: 34}
+    guidance: The elderly heat SOP applies; consider a cooler time or an indoor alternative.
+    rationale: Provides a dedicated high-severity heat rule for elderly users.
+  - id: ELD-02
+    name: Cold and elderly outdoors
+    category: elderly
+    activities: [elderly, senior]
+    scope: activity
+    severity: caution
+    priority: 60
+    lead: false
+    conditions:
+      all:
+        - {field: temperature_2m, source: hourly, aggregate: min, op: "<=", value: 8}
+    guidance: The elderly cold SOP applies; consider a warmer time or indoor alternative.
+    rationale: Adds a distinct cold-weather rule for the elderly category.
+  - id: PET-01
+    name: Heat and pets
+    category: pets
+    activities: [pets, dog, walking_pet]
+    scope: activity
+    severity: caution
+    priority: 55
+    lead: false
+    conditions:
+      all:
+        - {field: temperature_2m, source: hourly, aggregate: max, op: ">=", value: 32}
+    guidance: The pet-heat SOP applies; consider a cooler walking time and avoid prolonged outdoor exposure.
+    rationale: Covers elevated heat for pet-related outdoor activity.
+  - id: HIKE-01
+    name: Thunderstorms or rain while hiking
+    category: hiking
+    activities: [hiking, trekking]
+    scope: activity
+    severity: high
+    priority: 95
+    lead: false
+    conditions:
+      any:
+        - {field: weather_code, source: hourly, aggregate: any_thunderstorm, op: "==", value: true}
+        - {field: precipitation_probability, source: hourly, aggregate: max, op: ">=", value: 60}
+    guidance: The hiking weather SOP applies; consider postponing the hike when thunderstorms or substantial rain risk are present.
+    rationale: Treats thunderstorms or high rain probability as a high-severity hiking trigger.
+  - id: TRV-01
+    name: Rain and road travel
+    category: travel
+    activities: [road_travel, driving, travel, commute]
+    scope: activity
+    severity: caution
+    priority: 75
+    lead: false
+    conditions:
+      any:
+        - {field: precipitation, source: hourly, aggregate: max, op: ">=", value: 4}
+        - {field: weather_code, source: hourly, aggregate: any_thunderstorm, op: "==", value: true}
+    guidance: The road-travel SOP applies; allow for possible disruption and consider postponing if the trip is not necessary.
+    rationale: Covers substantial precipitation or thunderstorms during road travel.
+  - id: PIC-01
+    name: Picnic suitability rubric
+    category: recreation
+    activities: [picnic]
+    scope: activity
+    severity: info
+    priority: 40
+    lead: false
+    type: rubric
+    rubric:
+      - {field: temperature_2m, source: hourly, aggregate: min, op: ">=", value: 18}
+      - {field: temperature_2m, source: hourly, aggregate: max, op: "<=", value: 32}
+      - {field: wind_speed_10m, source: hourly, aggregate: max, op: "<", value: 20}
+      - {field: precipitation_probability, source: hourly, aggregate: max, op: "<", value: 25}
+      - {field: uv_index, source: hourly, aggregate: max, op: "<", value: 8}
+    min_pass: 4
+    guidance: The picnic rubric applies; the result is based on how many of the picnic conditions are met in the selected window.
+    rationale: Demonstrates a fuzzy suitability decision without letting the model invent criteria.
+  - id: SEV-01
+    name: Severe weather proxy
+    category: global_severe
+    activities: [any]
+    scope: global
+    severity: high
+    priority: 1000
+    lead: true
+    type: severe_proxy
+    conditions:
+      at_least:
+        n: 2
+        of:
+          - {field: precipitation_sum, source: daily, aggregate: max, op: ">=", value: 64.5}
+          - {field: precipitation_probability_max, source: daily, aggregate: max, op: ">=", value: 70}
+          - {field: weather_code, source: hourly, aggregate: any_thunderstorm, op: "==", value: true}
+          - {field: wind_gusts_10m_max, source: daily, aggregate: max, op: ">=", value: 50}
+    guidance: The severe-weather proxy SOP applies and leads the response. Treat the outdoor activity as high severity under this configured policy and consider postponing it.
+    rationale: Open-Meteo does not expose an official IMD low-pressure/cyclonic-system flag here, so this is a data-derived proxy rather than an official meteorological classification.

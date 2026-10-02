@@ -1,0 +1,23 @@
+current:
+  - temperature_2m
+  - precipitation
+  - precipitation_probability
+  - wind_speed_10m
+  - wind_gusts_10m
+  - weather_code
+  - uv_index
+hourly:
+  - temperature_2m
+  - precipitation
+  - precipitation_probability
+  - wind_speed_10m
+  - wind_gusts_10m
+  - weather_code
+  - uv_index
+daily:
+  - temperature_2m_max
+  - temperature_2m_min
+  - precipitation_sum
+  - precipitation_probability_max
+  - wind_gusts_10m_max
+  - uv_index_max
